@@ -18,6 +18,7 @@ module AdminOnlyPII
 
   def can_see_pii?(user)
     return true unless SiteSetting.admin_only_pii_enabled?
+
     user.admin?
   end
 
