@@ -1,0 +1,4 @@
+plugins:
+  admin_only_pii_enabled:
+    default: false
+    client: true
