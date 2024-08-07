@@ -2,9 +2,11 @@
 
 # name: admin-only-pii
 # about: Enhances privacy by hiding personally identifiable information from non-admin users
-# version: 1.0.0
+# version: 1.0.1
 # authors: Jake Elmstedt
 # url: https://github.com/elmstedt/admin-only-pii
+
+enabled_site_setting :admin_only_pii_enabled
 
 AFFECTED_SERIALIZERS = %i[AdminUserSerializer AdminUserListSerializer UserAuthTokenSerializer UserCardSerializer].freeze
 PII_FIELDS = %w[ip_address registration_ip_address client_ip location email secondary_emails].freeze
@@ -15,8 +17,7 @@ module AdminOnlyPII
   module_function
 
   def can_see_pii?(user)
-    return true unless SiteSetting.admin_only_pii_enabled
-
+    return true unless SiteSetting.admin_only_pii_enabled?
     user.admin?
   end
 
@@ -46,14 +47,6 @@ end
 after_initialize do
   SiteSetting.moderators_view_emails = false
   SiteSetting.dashboard_hidden_reports = HIDDEN_REPORTS.join('|')
-
-  # Add the new site setting
-  register_site_setting(
-    :admin_only_pii_enabled,
-    type: 'bool',
-    default: true,
-    client: true
-  )
 
   AFFECTED_SERIALIZERS.each do |serializer_name|
     serializer_name.to_s.constantize.class_eval do
